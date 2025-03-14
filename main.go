@@ -9,6 +9,8 @@ import (
 	"runtime"
 
 	"fmt"
+
+	asciistring "github.com/Com1Software/Go-ASCII-String-Package"
 )
 
 // ----------------------------------------------------------------
@@ -106,8 +108,27 @@ func InitPage(xip string) string {
 		os.Exit(1)
 	}
 
-	fmt.Println(string(body))
+	//	fmt.Println(string(body))
+	fmt.Printf("\n\n len %d\n", len(body))
 	xdata = xdata + string(body)
+	chr := ""
+	line := ""
+	linecnt := 0
+	for x := 1; x < len(body); x++ {
+		chr = string(body[x : x+1])
+		if asciistring.StringToASCII(chr) == 10 {
+			fmt.Println(line)
+			line = ""
+			linecnt++
+		} else {
+			line = line + chr
+		}
+
+		//		fmt.Println(asciistring.StringToASCII(chr))
+		//		fmt.Println(chr)
+
+	}
+	fmt.Println(linecnt)
 	xdata = xdata + "<BR><BR>RSS Feed Reader"
 
 	//------------------------------------------------------------------------
