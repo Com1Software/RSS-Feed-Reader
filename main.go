@@ -47,24 +47,23 @@ func GetOutboundIP() net.IP {
 
 // Openbrowser : Opens default web browser to specified url
 func Openbrowser(url string) error {
-	var cmd string
-	var args []string
-	switch runtime.GOOS {
-	case "windows":
-		cmd = "cmd"
-		args = []string{"/c", "start msedge"}
-
-	case "linux":
-		cmd = "chromium-browser"
-		args = []string{""}
-
-	case "darwin":
-		cmd = "open"
-	default:
-		cmd = "xdg-open"
-	}
-	args = append(args, url)
-	return exec.Command(cmd, args...).Start()
+    var cmd string
+    var args []string
+    switch runtime.GOOS {
+    case "windows":
+        cmd = "cmd"
+        args = []string{"/c", "start", url}
+    case "linux":
+        cmd = "chromium-browser"
+        args = []string{url}
+    case "darwin":
+        cmd = "open"
+        args = []string{url}
+    default:
+        cmd = "xdg-open"
+        args = []string{url}
+    }
+    return exec.Command(cmd, args...).Start()
 }
 
 func InitPage(xip string) string {
