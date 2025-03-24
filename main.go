@@ -112,7 +112,7 @@ func InitPage(xip string) string {
 
 	//	fmt.Println(string(body))
 	fmt.Printf("\n\n len %d\n", len(body))
-	xdata = xdata + string(body)
+	//xdata = xdata + string(body)
 	chr := ""
 	line := ""
 	linecnt := 0
@@ -120,8 +120,10 @@ func InitPage(xip string) string {
 		chr = string(body[x : x+1])
 		if asciistring.StringToASCII(chr) == 10 {
 			fmt.Println(line)
+			xdata = xdata + line + "<BR>"
 			line = ""
 			linecnt++
+
 		} else {
 			line = line + chr
 		}
