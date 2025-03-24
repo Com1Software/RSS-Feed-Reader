@@ -7,10 +7,9 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 
 	"fmt"
-
-	asciistring "github.com/Com1Software/Go-ASCII-String-Package"
 )
 
 // ----------------------------------------------------------------
@@ -91,6 +90,7 @@ func InitPage(xip string) string {
 	xdata = xdata + "<BR><BR>"
 
 	url := "https://forecast.weather.gov/MapClick.php?lat=41.5&lon=-81.7&unit=0&lg=english&FcstType=dwml"
+	//url := "https://forecast.weather.gov/MapClick.php?lat=41.25&lon=-81.44&unit=0&lg=english&FcstType=dwml"
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -109,30 +109,81 @@ func InitPage(xip string) string {
 		fmt.Fprintf(os.Stderr, "Error reading response body: %v\n", err)
 		os.Exit(1)
 	}
-
-	//	fmt.Println(string(body))
-	fmt.Printf("\n\n len %d\n", len(body))
-	//xdata = xdata + string(body)
+	t := time.Now()
+	formattedTime := t.Format(time.Kitchen)
+	xdata = xdata + "Current Time : " + formattedTime + "<BR>"
 	chr := ""
-	line := ""
-	linecnt := 0
+	ton := false
+	word := ""
+	loc := ""
 	for x := 1; x < len(body); x++ {
 		chr = string(body[x : x+1])
-		if asciistring.StringToASCII(chr) == 10 {
-			fmt.Println(line)
-			xdata = xdata + line + "<BR>"
-			line = ""
-			linecnt++
+		if chr == "<" {
+			ton = true
+		}
+		if chr == ">" {
+			ton = false
+			word = ""
+		}
+		if ton {
+			word = word + chr
+		}
+		if word == "<location" {
+			tmp := ""
+			tdata := string(body[x+20 : x+170])
+			for xx := 1; xx < len(tdata)-18; xx++ {
+				if tdata[xx:xx+18] == "<area-description>" {
+					xx = xx + 18
+					for xx := xx; xx < len(tdata)-18; xx++ {
+						chr = string(tdata[xx : xx+1])
+						if chr == "<" {
+							break
+						}
+						tmp = tmp + chr
+					}
 
-		} else {
-			line = line + chr
+				}
+
+			}
+			loc = tmp
 		}
 
-		//		fmt.Println(asciistring.StringToASCII(chr))
-		//		fmt.Println(chr)
+	}
+	xdata = xdata + "<BR>Location : " + loc + "<BR>"
+	for x := 1; x < len(body); x++ {
+		chr = string(body[x : x+1])
+		if chr == "<" {
+			ton = true
+		}
+		if chr == ">" {
+			ton = false
+			word = ""
+		}
+		if ton {
+			word = word + chr
+		}
+		if word == "<temperature" {
+			if string(body[x+8:x+16]) == "apparent" {
+				temp := ""
+				tdata := string(body[x+20 : x+100])
+				for xx := 1; xx < len(tdata)-7; xx++ {
+					if tdata[xx:xx+7] == "<value>" {
+						xx = xx + 7
+						for xx := xx; xx < len(tdata)-7; xx++ {
+							chr = string(tdata[xx : xx+1])
+							if chr == "<" {
+								break
+							}
+							temp = temp + chr
+						}
+					}
+				}
+				xdata = xdata + "<BR>Current Temperature : " + temp
+			}
+		}
 
 	}
-	fmt.Println(linecnt)
+
 	xdata = xdata + "<BR><BR>RSS Feed Reader"
 
 	//------------------------------------------------------------------------
