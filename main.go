@@ -54,16 +54,20 @@ func Openbrowser(url string) error {
         cmd = "cmd"
         args = []string{"/c", "start", url}
     case "linux":
-        cmd = "chromium-browser"
+        cmd = "xdg-open"
         args = []string{url}
     case "darwin":
         cmd = "open"
         args = []string{url}
     default:
-        cmd = "xdg-open"
-        args = []string{url}
+        return fmt.Errorf("unsupported platform")
     }
-    return exec.Command(cmd, args...).Start()
+    
+    // Using CombinedOutput to capture errors
+    if err := exec.Command(cmd, args...).Start(); err != nil {
+        return fmt.Errorf("failed to open browser: %w", err)
+    }
+    return nil
 }
 
 func InitPage(xip string) string {
