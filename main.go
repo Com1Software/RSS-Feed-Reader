@@ -267,12 +267,66 @@ func InitPage(xip string) string {
 	}
 	xdata = xdata + "<BR>Current Conditions : " + cond + "<BR>"
 
-	xdata = xdata + "<BR><BR>RSS Feed Reader"
+	//------------------------------------------------------------------------ Wind
+	gust := ""
+	sust := ""
+	for x := 1; x < len(body); x++ {
+		chr = string(body[x : x+1])
+		if chr == "<" {
+			ton = true
+		}
+		if chr == ">" {
+			ton = false
+			word = ""
+		}
+		if ton {
+			word = word + chr
+		}
+		if word == "<wind-speed" {
+			if string(body[x+8:x+12]) == "gust" {
+				tdata := string(body[x+20 : x+100])
+				for xx := 1; xx < len(tdata)-7; xx++ {
+					if tdata[xx:xx+7] == "<value>" {
+						xx = xx + 7
+						for xx := xx; xx < len(tdata)-7; xx++ {
+							chr = string(tdata[xx : xx+1])
+							if chr == "<" {
+								break
+							}
+							gust = gust + chr
+						}
+					}
+				}
+			}
+			if string(body[x+8:x+17]) == "sustained" {
+				tdata := string(body[x+20 : x+100])
+				for xx := 1; xx < len(tdata)-7; xx++ {
+					if tdata[xx:xx+7] == "<value>" {
+						xx = xx + 7
+						for xx := xx; xx < len(tdata)-7; xx++ {
+							chr = string(tdata[xx : xx+1])
+							if chr == "<" {
+								break
+							}
+							sust = sust + chr
+						}
+					}
+				}
+
+			}
+
+		}
+	}
+	xdata = xdata + "<BR>Sustained Wind at " + sust + " Gusting to " + gust + "<BR>"
 
 	//------------------------------------------------------------------------
+
+	xdata = xdata + "<BR><BR>RSS Feed Reader"
 
 	xdata = xdata + "</center>"
 	xdata = xdata + " </body>"
 	xdata = xdata + " </html>"
+
 	return xdata
+
 }
