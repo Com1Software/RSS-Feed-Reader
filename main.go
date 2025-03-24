@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"fmt"
+
+	asciistring "github.com/Com1Software/Go-ASCII-String-Package"
 )
 
 // ----------------------------------------------------------------
@@ -116,6 +118,7 @@ func InitPage(xip string) string {
 	ton := false
 	word := ""
 	loc := ""
+	//------------------------------------------------------------------------ Location
 	for x := 1; x < len(body); x++ {
 		chr = string(body[x : x+1])
 		if chr == "<" {
@@ -150,6 +153,7 @@ func InitPage(xip string) string {
 
 	}
 	xdata = xdata + "<BR>Location : " + loc + "<BR>"
+	//------------------------------------------------------------------------ Temperature
 	for x := 1; x < len(body); x++ {
 		chr = string(body[x : x+1])
 		if chr == "<" {
@@ -178,11 +182,45 @@ func InitPage(xip string) string {
 						}
 					}
 				}
-				xdata = xdata + "<BR>Current Temperature : " + temp
+				xdata = xdata + "<BR>Current Temperature : " + temp + "<BR>"
 			}
 		}
 
 	}
+	//------------------------------------------------------------------------ Current Conditions
+	cond := ""
+	for x := 1; x < len(body); x++ {
+		chr = string(body[x : x+1])
+		if chr == "<" {
+			ton = true
+		}
+		if chr == ">" {
+			ton = false
+			word = ""
+		}
+		if ton {
+			word = word + chr
+		}
+		if word == "<weather-conditions w" {
+			cond = ""
+			tdata := string(body[x+10 : x+50])
+			tt := false
+			for xx := 1; xx < len(tdata); xx++ {
+				chr = string(tdata[xx : xx+1])
+				if tt {
+					cond = cond + chr
+				}
+				switch {
+				case asciistring.StringToASCII(chr) == 34 && tt == false:
+					tt = true
+				case asciistring.StringToASCII(chr) == 34 && tt == true:
+					tt = false
+				}
+			}
+		}
+
+	}
+	xdata = xdata + "<BR>Current Conditions : " + cond + "<BR>"
 
 	xdata = xdata + "<BR><BR>RSS Feed Reader"
 
