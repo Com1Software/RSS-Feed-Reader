@@ -46,28 +46,27 @@ func GetOutboundIP() net.IP {
 }
 
 // Openbrowser : Opens default web browser to specified url
+
+// Openbrowser : Opens default web browser to specified url
 func Openbrowser(url string) error {
-    var cmd string
-    var args []string
-    switch runtime.GOOS {
-    case "windows":
-        cmd = "cmd"
-        args = []string{"/c", "start", url}
-    case "linux":
-        cmd = "xdg-open"
-        args = []string{url}
-    case "darwin":
-        cmd = "open"
-        args = []string{url}
-    default:
-        return fmt.Errorf("unsupported platform")
-    }
-    
-    // Using CombinedOutput to capture errors
-    if err := exec.Command(cmd, args...).Start(); err != nil {
-        return fmt.Errorf("failed to open browser: %w", err)
-    }
-    return nil
+	var cmd string
+	var args []string
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start msedge"}
+
+	case "linux":
+		cmd = "chromium-browser"
+		args = []string{""}
+
+	case "darwin":
+		cmd = "open -a Safari"
+	default:
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	return exec.Command(cmd, args...).Start()
 }
 
 func InitPage(xip string) string {
