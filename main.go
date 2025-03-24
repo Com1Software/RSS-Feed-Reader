@@ -153,6 +153,47 @@ func InitPage(xip string) string {
 
 	}
 	xdata = xdata + "<BR>Location : " + loc + "<BR>"
+	//------------------------------------------------------------------------ Hazzard Warning
+	hazctl := false
+	haz := ""
+	for x := 1; x < len(body); x++ {
+		chr = string(body[x : x+1])
+		if chr == "<" {
+			ton = true
+		}
+		if chr == ">" {
+			ton = false
+			word = ""
+		}
+		if ton {
+			word = word + chr
+		}
+		if word == "<hazard headline" {
+			haz = ""
+			hazctl = true
+			tdata := string(body[x : x+30])
+			tt := false
+			for xx := 1; xx < len(tdata); xx++ {
+				chr = string(tdata[xx : xx+1])
+				if tt {
+					if asciistring.StringToASCII(chr) != 34 {
+						haz = haz + chr
+					}
+				}
+				switch {
+				case asciistring.StringToASCII(chr) == 34 && tt == false:
+					tt = true
+				case asciistring.StringToASCII(chr) == 34 && tt == true:
+					tt = false
+				}
+			}
+		}
+
+	}
+	if hazctl {
+		xdata = xdata + "<BR>Hazard Warning : " + haz + "<BR>"
+	}
+
 	//------------------------------------------------------------------------ Temperature
 	for x := 1; x < len(body); x++ {
 		chr = string(body[x : x+1])
@@ -199,8 +240,10 @@ func InitPage(xip string) string {
 			word = ""
 		}
 		if ton {
+
 			word = word + chr
 		}
+
 		if word == "<weather-conditions w" {
 			cond = ""
 			tdata := string(body[x+10 : x+50])
@@ -208,7 +251,9 @@ func InitPage(xip string) string {
 			for xx := 1; xx < len(tdata); xx++ {
 				chr = string(tdata[xx : xx+1])
 				if tt {
-					cond = cond + chr
+					if asciistring.StringToASCII(chr) != 34 {
+						cond = cond + chr
+					}
 				}
 				switch {
 				case asciistring.StringToASCII(chr) == 34 && tt == false:
