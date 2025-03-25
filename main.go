@@ -298,6 +298,9 @@ func InitPage(xip string) string {
 					}
 				}
 			}
+			if gust == "NA" {
+				gust = ""
+			}
 			if string(body[x+8:x+17]) == "sustained" {
 				tdata := string(body[x+20 : x+100])
 				for xx := 1; xx < len(tdata)-7; xx++ {
@@ -317,8 +320,13 @@ func InitPage(xip string) string {
 
 		}
 	}
-	xdata = xdata + "<BR>Sustained Wind at " + sust + " Gusting to " + gust + "<BR>"
+	xdata = xdata + "<BR>Sustained Wind at " + sust + " MPH"
 
+	if len(gust) > 0 {
+		xdata = xdata + " Gusting to " + gust + " MPH"
+	}
+	xdata = xdata + "<BR>"
+	//------------------------------------------------------------------------ Humidity
 	//------------------------------------------------------------------------
 
 	xdata = xdata + "<BR><BR>RSS Feed Reader"
