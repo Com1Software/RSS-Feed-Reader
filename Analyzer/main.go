@@ -10,8 +10,6 @@ import (
 	"time"
 
 	"fmt"
-
-	asciistring "github.com/Com1Software/Go-ASCII-String-Package"
 )
 
 // ----------------------------------------------------------------
@@ -92,7 +90,6 @@ func InitPage(xip string) string {
 	xdata = xdata + "<BR><BR>"
 
 	url := "https://forecast.weather.gov/MapClick.php?lat=41.5&lon=-81.7&unit=0&lg=english&FcstType=dwml"
-	//url := "https://forecast.weather.gov/MapClick.php?lat=41.25&lon=-81.44&unit=0&lg=english&FcstType=dwml"
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -153,181 +150,6 @@ func InitPage(xip string) string {
 
 	}
 	xdata = xdata + "<BR>Location : " + loc + "<BR>"
-	//------------------------------------------------------------------------ Hazzard Warning
-	hazctl := false
-	haz := ""
-	for x := 1; x < len(body); x++ {
-		chr = string(body[x : x+1])
-		if chr == "<" {
-			ton = true
-		}
-		if chr == ">" {
-			ton = false
-			word = ""
-		}
-		if ton {
-			word = word + chr
-		}
-		if word == "<hazard headline" {
-			haz = ""
-			hazctl = true
-			tdata := string(body[x : x+30])
-			tt := false
-			for xx := 1; xx < len(tdata); xx++ {
-				chr = string(tdata[xx : xx+1])
-				if tt {
-					if asciistring.StringToASCII(chr) != 34 {
-						haz = haz + chr
-					}
-				}
-				switch {
-				case asciistring.StringToASCII(chr) == 34 && tt == false:
-					tt = true
-				case asciistring.StringToASCII(chr) == 34 && tt == true:
-					tt = false
-				}
-			}
-		}
-
-	}
-	if hazctl {
-		xdata = xdata + "<BR>Hazard Warning : " + haz + "<BR>"
-	}
-
-	//------------------------------------------------------------------------ Temperature
-	for x := 1; x < len(body); x++ {
-		chr = string(body[x : x+1])
-		if chr == "<" {
-			ton = true
-		}
-		if chr == ">" {
-			ton = false
-			word = ""
-		}
-		if ton {
-			word = word + chr
-		}
-		if word == "<temperature" {
-			if string(body[x+8:x+16]) == "apparent" {
-				temp := ""
-				tdata := string(body[x+20 : x+100])
-				for xx := 1; xx < len(tdata)-7; xx++ {
-					if tdata[xx:xx+7] == "<value>" {
-						xx = xx + 7
-						for xx := xx; xx < len(tdata)-7; xx++ {
-							chr = string(tdata[xx : xx+1])
-							if chr == "<" {
-								break
-							}
-							temp = temp + chr
-						}
-					}
-				}
-				xdata = xdata + "<BR>Current Temperature : " + temp + "<BR>"
-			}
-		}
-
-	}
-	//------------------------------------------------------------------------ Current Conditions
-	cond := ""
-	for x := 1; x < len(body); x++ {
-		chr = string(body[x : x+1])
-		if chr == "<" {
-			ton = true
-		}
-		if chr == ">" {
-			ton = false
-			word = ""
-		}
-		if ton {
-
-			word = word + chr
-		}
-
-		if word == "<weather-conditions w" {
-			cond = ""
-			tdata := string(body[x+10 : x+50])
-			tt := false
-			for xx := 1; xx < len(tdata); xx++ {
-				chr = string(tdata[xx : xx+1])
-				if tt {
-					if asciistring.StringToASCII(chr) != 34 {
-						cond = cond + chr
-					}
-				}
-				switch {
-				case asciistring.StringToASCII(chr) == 34 && tt == false:
-					tt = true
-				case asciistring.StringToASCII(chr) == 34 && tt == true:
-					tt = false
-				}
-			}
-		}
-
-	}
-	xdata = xdata + "<BR>Current Conditions : " + cond + "<BR>"
-
-	//------------------------------------------------------------------------ Wind
-	gust := ""
-	sust := ""
-	for x := 1; x < len(body); x++ {
-		chr = string(body[x : x+1])
-		if chr == "<" {
-			ton = true
-		}
-		if chr == ">" {
-			ton = false
-			word = ""
-		}
-		if ton {
-			word = word + chr
-		}
-		if word == "<wind-speed" {
-			if string(body[x+8:x+12]) == "gust" {
-				tdata := string(body[x+20 : x+100])
-				for xx := 1; xx < len(tdata)-7; xx++ {
-					if tdata[xx:xx+7] == "<value>" {
-						xx = xx + 7
-						for xx := xx; xx < len(tdata)-7; xx++ {
-							chr = string(tdata[xx : xx+1])
-							if chr == "<" {
-								break
-							}
-							gust = gust + chr
-						}
-					}
-				}
-			}
-			if gust == "NA" {
-				gust = ""
-			}
-			if string(body[x+8:x+17]) == "sustained" {
-				tdata := string(body[x+20 : x+100])
-				for xx := 1; xx < len(tdata)-7; xx++ {
-					if tdata[xx:xx+7] == "<value>" {
-						xx = xx + 7
-						for xx := xx; xx < len(tdata)-7; xx++ {
-							chr = string(tdata[xx : xx+1])
-							if chr == "<" {
-								break
-							}
-							sust = sust + chr
-						}
-					}
-				}
-
-			}
-
-		}
-	}
-	xdata = xdata + "<BR>Sustained Wind at " + sust + " MPH"
-
-	if len(gust) > 0 {
-		xdata = xdata + " Gusting to " + gust + " MPH"
-	}
-	xdata = xdata + "<BR>"
-	//------------------------------------------------------------------------ Humidity
-	//------------------------------------------------------------------------
 
 	xdata = xdata + "<BR><BR>RSS Feed Reader"
 
