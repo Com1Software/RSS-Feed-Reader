@@ -12,24 +12,9 @@ import (
 	"fmt"
 )
 
-// ----------------------------------------------------------------
-func main() {
-	fmt.Println("Video Web Server")
-	fmt.Printf("Operating System : %s\n", runtime.GOOS)
-	xip := fmt.Sprintf("%s", GetOutboundIP())
-	port := "8080"
-	fmt.Println("Server running....")
-	fmt.Println("Listening on " + xip + ":" + port)
-
-	fmt.Println("")
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		xdata := InitPage(xip)
-		fmt.Fprint(w, xdata)
-	})
-	Openbrowser(xip + ":" + port)
-	if err := http.ListenAndServe(xip+":"+port, nil); err != nil {
-		panic(err)
-	}
+// -----------------------------------------------------------------
+type taglist struct {
+	tag string
 }
 
 func GetOutboundIP() net.IP {
@@ -70,19 +55,21 @@ func Openbrowser(url string) error {
 
 func InitPage(xip string) string {
 	//---------------------------------------------------------------------------
+	taglist := []taglist{}
+
 	//----------------------------------------------------------------------------
 	xdata := "<!DOCTYPE html>"
 	xdata = xdata + "<html>"
 	xdata = xdata + "<head>"
 	//------------------------------------------------------------------------
-	xdata = xdata + "<title>RSS Feed Reader</title>"
+	xdata = xdata + "<title>RSS Feed Analyzer</title>"
 	//------------------------------------------------------------------------
 	xdata = xdata + "</head>"
 	//------------------------------------------------------------------------
 
 	xdata = xdata + "<body>"
 	xdata = xdata + "<center>"
-	xdata = xdata + "<H1>RSS Feed Reader</H1>"
+	xdata = xdata + "<H1>RSS Feed Analyzer</H1>"
 	//---------
 	xdata = xdata + "<body>"
 
@@ -122,36 +109,19 @@ func InitPage(xip string) string {
 			ton = true
 		}
 		if chr == ">" {
+			taglist = LookUpTag(taglist, word)
 			ton = false
 			word = ""
 		}
 		if ton {
 			word = word + chr
-		}
-		if word == "<location" {
-			tmp := ""
-			tdata := string(body[x+20 : x+170])
-			for xx := 1; xx < len(tdata)-18; xx++ {
-				if tdata[xx:xx+18] == "<area-description>" {
-					xx = xx + 18
-					for xx := xx; xx < len(tdata)-18; xx++ {
-						chr = string(tdata[xx : xx+1])
-						if chr == "<" {
-							break
-						}
-						tmp = tmp + chr
-					}
 
-				}
-
-			}
-			loc = tmp
 		}
 
 	}
 	xdata = xdata + "<BR>Location : " + loc + "<BR>"
 
-	xdata = xdata + "<BR><BR>RSS Feed Reader"
+	xdata = xdata + "<BR><BR>RSS Feed Analyzer"
 
 	xdata = xdata + "</center>"
 	xdata = xdata + " </body>"
@@ -159,4 +129,31 @@ func InitPage(xip string) string {
 
 	return xdata
 
+}
+
+func LookUpTag(tags []taglist, tag string) []taglist {
+	fmt.Println(tag)
+	fmt.Println(len(tags))
+
+	return tags
+}
+
+// ----------------------------------------------------------------
+func main() {
+	fmt.Println("Video Web Server")
+	fmt.Printf("Operating System : %s\n", runtime.GOOS)
+	xip := fmt.Sprintf("%s", GetOutboundIP())
+	port := "8080"
+	fmt.Println("Server running....")
+	fmt.Println("Listening on " + xip + ":" + port)
+
+	fmt.Println("")
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		xdata := InitPage(xip)
+		fmt.Fprint(w, xdata)
+	})
+	Openbrowser(xip + ":" + port)
+	if err := http.ListenAndServe(xip+":"+port, nil); err != nil {
+		panic(err)
+	}
 }
