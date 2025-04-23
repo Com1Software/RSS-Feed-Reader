@@ -14,7 +14,8 @@ import (
 
 // -----------------------------------------------------------------
 type taglist struct {
-	tag string
+	tag    string
+	tagcnt int
 }
 
 func GetOutboundIP() net.IP {
@@ -101,7 +102,6 @@ func InitPage(xip string) string {
 	chr := ""
 	ton := false
 	word := ""
-	loc := ""
 	//------------------------------------------------------------------------ Location
 	for x := 1; x < len(body); x++ {
 		chr = string(body[x : x+1])
@@ -114,12 +114,18 @@ func InitPage(xip string) string {
 			word = ""
 		}
 		if ton {
-			word = word + chr
-
+			if chr != "<" {
+				if chr != "/" {
+					word = word + chr
+				}
+			}
 		}
 
 	}
-	xdata = xdata + "<BR>Location : " + loc + "<BR>"
+
+	for i := 0; i < len(taglist); i++ {
+		xdata = xdata + "<BR>" + taglist[i].tag + " : " + fmt.Sprint(taglist[i].tagcnt)
+	}
 
 	xdata = xdata + "<BR><BR>RSS Feed Analyzer"
 
@@ -132,8 +138,21 @@ func InitPage(xip string) string {
 }
 
 func LookUpTag(tags []taglist, tag string) []taglist {
-	fmt.Println(tag)
-	fmt.Println(len(tags))
+	fmt.Println("Tag : ", tag)
+	fmt.Println("Tag Count : ", len(tags))
+	at := false
+	for i := 0; i < len(tags); i++ {
+		if tags[i].tag == tag {
+			tags[i].tagcnt++
+			at = true
+			break
+		}
+	}
+
+	if !at {
+		newTag := taglist{tag: tag, tagcnt: 1}
+		tags = append(tags, newTag) // Append the new tag to the list
+	}
 
 	return tags
 }
