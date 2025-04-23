@@ -77,8 +77,8 @@ func InitPage(xip string) string {
 	xdata = xdata + "Host Port IP : " + xip
 	xdata = xdata + "<BR><BR>"
 
-	url := "https://forecast.weather.gov/MapClick.php?lat=41.5&lon=-81.7&unit=0&lg=english&FcstType=dwml"
-
+	//url := "https://forecast.weather.gov/MapClick.php?lat=41.5&lon=-81.7&unit=0&lg=english&FcstType=dwml"
+	url := "https://www.cbsnews.com/latest/rss/main"
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error fetching URL: %v\n", err)
